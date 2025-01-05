@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PagomóvilBDV</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 60px;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-img {
+            width: 32px;
+            height: 29px;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .qr-section {
+            text-align: right;
+        }
+
+        .qr-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .qr-button {
+            background-color: #0563b3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Form Styles */
+        .form-container {
+            padding: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #666;
+            background-color:white;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+
+        .form-control::placeholder {
+            color: #999;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .document-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .document-container .form-control {
+            margin-bottom: 0;
+            padding-right: 50px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            background-color:#0563b3;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .search-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: center;
+            background-color: #1368b0;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-around;
+            background-color: #0563b3;
+            padding: 8px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 0.75rem;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* Receipt View Styles */
+        #formView, #receiptView {
+            display: none;
+        }
+
+        #formView.active, #receiptView.active {
+            display: block;
+        }
+
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .receipt-header h1 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .receipt-content {
+            padding: 1.3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-name {
+            font-size: 1.000rem;
+            margin-bottom: 0.4rem;
+            align-items: center;
+        }
+
+        .checkmark {
+            width: 1.40rem;  /* Made slightly smaller */
+            height: 1.40rem;
+            background-color: #c82d2d;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.90rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .amount {
+            width: 90%;
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border-radius: 1.1rem;
+            text-align: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .amount-input {
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            text-align: center;
+            width: 100%;
+            outline: none;
+        }
+
+        .details {
+            width: 96%;
+            margin-bottom: 4rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .detail-label {
+            color: black;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #6b7280;
+            border: none;
+            background: transparent;
+            text-align: right;
+            outline: none;
+            min-width: 200px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .copy-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+
+        .back-arrow {
+            width: 30px;
+            height: 30px;
+            display: block;
+            margin: 2rem auto;
+        }
+
+        .switch-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding: 0 1rem;
+        }
+
+        .switch {
+            width: 3rem;
+            height: 1.5rem;
+            background-color: #e5e7eb;
+            border-radius: 1rem;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .switch.active {
+            background-color: #FF0000;
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: white;
+            border-radius: 50%;
+            top: 0.125rem;
+            left: 0.125rem;
+            transition: left 0.3s;
+        }
+
+        .switch.active::after {
+            left: 1.625rem;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="toast" class="toast"></div>
+        
+        <!-- Form View -->
+        <div id="formView" class="active">
+            <header class="header">
+                <div class="header-left">
+                    <img src="https://i.postimg.cc/1VcRPV10/campanita.png" alt="Logo" class="logo-img">
+                    <span class="header-title">PagomóvilBDV</span>
+                </div>
+                <div class="qr-section">
+                    <div class="qr-text">Leer código QR</div>
+                    <button class="qr-button">                   	
+                        <img src="https://i.postimg.cc/CRKMTKPD/qr.png" alt="QR" style="width: 20px; height: 20px; ">
+                    </button>
+                </div>
+            </header>
+
+            <div class="form-container">
+                <form id="paymentForm">
+                    <select class="form-control" name="type" required>
+                        <option value="personas">Personas</option>
+                        <option value="personas">Comercio</option>
+                    </select>
+
+                    <div class="document-container">
+                        <input type="text" class="form-control" name="document" placeholder="Documento:" required>
+                        <div class="search-icon">
+                            <img src="https://i.postimg.cc/tYkRM65p/persona.png" alt="Search">
+                        </div>
+                    </div>
+
+                    <select class="form-control" name="bank" required>
+                        <option value="">Banco:</option>
+                        <option value="0102">0102 - BANCO DE VENEZUELA</option>
+                        <option value="0156">0156 - 100% BANCO</option>
+                        <option value="0172">0172 - BANCAMIGA BANCO MICROFINANCIERO C A</option>
+                        <option value="0114">0114 - BANCARIBE</option>
+                        <option value="0171">0171 - BANCO ACTIVO</option>
+                        <option value="0166">0166 - BANCO AGRICOLA DE VENEZUELA</option>
+                        <option value="0175">0175 - BANCO BICENTENARIO DEL PUEBLO</option>
+                        <option value="0128">0128 - BANCO CARONI</option>
+                        <option value="0163">0163 - BANCO DEL TESORO</option>
+                        <option value="0115">0115 - BANCO EXTERIOR</option>
+                        <option value="0151">0151 - BANCO FONDO COMUN</option>
+                        <option value="0173">0173 - BANCO INTERNACIONAL DE DESARROLLO</option>
+                        <option value="0105">0105 - BANCO MERCANTIL</option>
+                        <option value="0191">0191 - BANCO NACIONAL DE CREDITO</option>
+                        <option value="0138">0138 - BANCO PLAZA</option>
+                        <option value="0137">0137 - BANCO SOFITASA</option>
+                        <option value="0104">0104 - BANCO VENEZOLANO DE CREDITO</option>
+                        <option value="0168">0168 - BANCRECER</option>
+                        <option value="0175">0175 - BANCO DIGITAL DE LOS TRABAJADORES</option>
+                        <option value="0134">0134 - BANESCO</option>
+                        <option value="0177">0177 - BANFANB</option>
+                        <option value="0146">0146 - BANGENTE</option>
+                        <option value="0174">0174 - BANPLUS</option>
+                        <option value="0108">0108 - BBVA PROVINCIAL</option>
+                        <option value="0157">0157 - DELSUR BANCO UNIVERSAL</option>
+                        <option value="0169">0169 - MI BANCO</option>
+                        <option value="0178">0178 - N58 BANCO DIGITAL MICROFINANCIERO S A</option>
+                    </select>
+
+                    <input type="tel" class="form-control" name="phone" placeholder="Teléfono:" required>
+                    <input type="text" class="form-control" name="amount" placeholder="Monto:" required>
+                    <input type="text" class="form-control" name="concept" placeholder="Concepto:" required>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn">Pagar</button>
+                        <button type="button" class="btn" onclick="clearForm()">Limpiar</button>
+                    </div>
+                </form>
+            </div>
+
+            <nav class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <img src="https://i.postimg.cc/RqcZwyJ3/inicio.png" alt="Inicio" class="nav-icon">
+                    <span>Inicio</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <img src="https://i.postimg.cc/hz0h00jz/transferencias.png" alt="Transf..." class="nav-icon">
+                    <span>Transf...</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <img src="https://i.postimg.cc/w1tydJWZ/pagos.png" alt="Pagos" class="nav-icon">
+                    <span>Pagos</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <img src="https://i.postimg.cc/YLq0DmGX/servicios.png" alt="Servicios" class="nav-icon">
+                    <span>Servicios</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <img src="https://i.postimg.cc/svHQ8KJ5/divisas.png" alt="Servicios" class="nav-icon">
+                    <span>Divisas</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <img src="https://i.postimg.cc/cg3495Db/Cripto.png" alt="Cripto" class="nav-icon">
+                    <span>Cripto</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Receipt View -->
+        <div id="receiptView">
+            <header class="receipt-header">
+                <img src="https://i.postimg.cc/gw6Wb0J1/back-arrow.png" alt="Atrás" class="icon" onclick="showFormView()">
+                <h1>Comprobante de operación</h1>
+                <img src="https://i.postimg.cc/PvKGQp3v/share.png" alt="Compartir" class="icon" onclick="shareReceipt()">
+            </header>
+            <main class="receipt-content">
+                <img src="https://i.postimg.cc/xJDSfSN8/logo.png" alt="logo" class="logo">
+                <div class="app-name">PagomóvilBDV Personas</div>                                      
+                <div class="checkmark">✓</div>
+                <div class="amount">
+                    <input type="text" class="amount-input" id="receiptAmount" readonly />
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha:</span>
+                        <input type="text" id="receiptDate" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Operación:</span>
+                        <div style="display: flex; align-items: center;">
+                            <input type="text" id="receiptOperation" class="detail-value" value="001765883896" readonly />
+                            <img src="https://i.postimg.cc/ftcQkgYK/clipboard.png" alt="Copiar" class="copy-icon" onclick="copyOperation()">
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Identificación:</span>
+                        <input type="text" id="receiptDocument" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Origen:</span>
+                        <input type="text" id="receiptOrigin" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Destino:</span>
+                        <input type="text" id="receiptPhone" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Banco:</span>
+                        <input type="text" id="receiptBank" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Concepto:</span>
+                        <input type="text" id="receiptConcept" class="detail-value" readonly />
+                    </div>
+                </div>
+
+                <img src="https://i.postimg.cc/xN9DmyRS/red-arrow.png" alt="Atrás" class="back-arrow">
+
+                <div class="switch-row">
+                    <div class="switch" onclick="toggleSwitch(this)"></div>
+                    <span>Crear Acceso directo</span>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function generateRandomOperation() {
+            return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+        }
+
+        function generateRandomOrigin() {
+            const prefix = "0102";
+            const randomSuffix = Math.floor(1000 + Math.random() * 9000).toString();
+            return `${prefix}****${randomSuffix}`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function shareReceipt() {
+            const amount = document.querySelector('.amount-input').value;
+            showToast(`El Pago Fue Exitoso ${amount}`);
+        }
+
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        function copyOperation() {
+            const operationInput = document.getElementById('receiptOperation');
+            navigator.clipboard.writeText(operationInput.value)
+                .then(() => showToast('Número de operación copiado al portapapeles'))
+                .catch(err => console.error('Error al copiar:', err));
+        }
+
+        function showFormView() {
+            document.getElementById('formView').classList.add('active');
+            document.getElementById('receiptView').classList.remove('active');
+        }
+
+        function showReceiptView() {
+            document.getElementById('formView').classList.remove('active');
+            document.getElementById('receiptView').classList.add('active');
+        }
+
+        function clearForm() {
+            document.getElementById('paymentForm').reset();
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            // Get the selected bank option to include both code and name
+            const bankSelect = document.querySelector('select[name="bank"]');
+            const selectedBank = bankSelect.options[bankSelect.selectedIndex].text;
+            
+            document.getElementById('receiptAmount').value = formData.get('amount') + ' Bs';
+            document.getElementById('receiptDate').value = new Date().toLocaleDateString();
+            document.getElementById('receiptDocument').value = formData.get('document');
+            document.getElementById('receiptPhone').value = formData.get('phone');
+            document.getElementById('receiptBank').value = selectedBank;
+            document.getElementById('receiptConcept').value = formData.get('concept');
+            
+            // Generate and set a random operation number
+            document.getElementById('receiptOperation').value = generateRandomOperation();
+
+            // Generate and set a random origin number
+            document.getElementById('receiptOrigin').value = generateRandomOrigin();
+
+            showReceiptView();
+        });
+
+        document.querySelector('input[name="amount"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d,]/g, '');
+            if (value) {
+                value = value.replace(/^(\d+,?\d{0,2}).*/, '$1');
+                e.target.value = value;
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+

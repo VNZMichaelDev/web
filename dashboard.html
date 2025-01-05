@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            padding-bottom: 70px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .notification {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: #dc2626;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bell-icon {
+            position: absolute;
+            left: 21px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .title {
+            margin-left: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .menu-button {
+            padding: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .menu-line {
+            width: 20px;
+            height: 2px;
+            background: black;
+            margin: 3px 0;
+        }
+
+        .balance-card {
+            margin: 1rem;
+            padding: 1.5rem;
+            background: #0066cc;
+            color: white;
+            border-radius: 12px;
+        }
+
+        .balance-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .balance-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .action-button svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .balance-amount {
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .balance-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .account-number {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .movements {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .movements svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .history {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .history-title {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .update-button {
+            color: #0066cc;
+            font-size: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .transaction {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .transaction-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .transaction-arrow {
+            color: #0066cc;
+            font-size: 18px;
+        }
+
+        .transaction-type {
+            font-size: 14px;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .amount {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0066cc;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-size: 12px;
+            padding: 0.5rem;
+        }
+
+        .nav-item.active {
+            color: white;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .payment-menu {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .payment-menu.active {
+            display: block;
+        }
+
+        .payment-option {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            margin: 0.25rem 0;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .payment-option:hover {
+            background: #f5f5f5;
+        }
+
+        .card-message {
+            height: calc(100vh - 140px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Página de inicio -->
+    <div id="home-page" class="page active">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="notification">3</div>
+                </div>
+                <svg class="bell-icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <h1 class="title">Inicio</h1>
+            </div>
+            <button class="menu-button">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </button>
+        </header>
+
+        <div class="balance-card">
+            <div class="balance-content">
+                <div class="balance-top">
+                    <div class="balance-label">Saldo Cuenta Corriente</div>
+                    <div class="quick-actions">
+                        <button class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </button>
+                        <button class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                        </button>
+                        <button class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </button>
+                        <button class="action-button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="balance-amount">Bs. 2320,50</div>
+                <div class="balance-bottom">
+                    <div class="account-number">0102****8620</div>
+                    <div class="movements">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 8v4l3 3"></path>
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                        <span>Movimientos en línea</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history">
+            <div class="history-header">
+                <div class="history-title">Histórico de operaciones</div>
+                <button class="update-button">Actualizar</button>
+            </div>
+
+            <div class="transactions">
+                <div class="transaction">
+                    <div class="transaction-date">LUNES, 23 DE DICIEMBRE</div>
+                    <div class="transaction-details">
+                        <div class="transaction-info">
+                            <span class="transaction-arrow">←</span>
+                            <span class="transaction-type">Transferencias a terceros BDV</span>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount">2.061,60 Bs</div>
+                            <div class="time">03:35 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="transaction">
+                    <div class="transaction-date">MARTES, 17 DE DICIEMBRE</div>
+                    <div class="transaction-details">
+                        <div class="transaction-info">
+                            <span class="transaction-arrow">←</span>
+                            <span class="transaction-type">Transferencias a terceros BDV</span>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount">1.850,00 Bs</div>
+                            <div class="time">01:51 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Más transacciones aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Página de pagos -->
+    <div id="payments-page" class="page">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="notification">3</div>
+                </div>
+                <h1 class="title">Pagos</h1>
+            </div>
+            <button class="menu-button">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </button>
+        </header>
+
+        <div class="payment-menu">
+           <a href="formulario.html"><button class="payment-option">PagomóvilBDV</button></a> 
+            <a href="go:S147"><button class="payment-option">PagomóvilBDV QR</button></a>
+            <a href="go:S123"><button class="payment-option">Tarjeta de crédito</button></a>
+            <a href="go:S130"><button class="payment-option">Financiamiento especial</button></a>
+            <button class="payment-option">Pagos compartidos</button>
+        </div>
+    </div>
+
+    <!-- Página de tarjeta -->
+    <div id="card-page" class="page">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="notification">3</div>
+                </div>
+                <h1 class="title">Tarjeta</h1>
+            </div>
+            <button class="menu-button">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </button>
+        </header>
+
+        <div class="card-message">
+            <p>No posees una TDC prepagada o digital</p>
+        </div>
+    </div>
+
+    <!-- Barra de navegación inferior -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-page="home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Inicio</span>
+        </a>
+        <a href="#" class="nav-item" data-page="transfers">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 1l4 4-4 4"></path>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <path d="M7 23l-4-4 4-4"></path>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+            <span>Transferencias</span>
+        </a>
+        <a href="#" class="nav-item" data-page="payments">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <span>Pagos</span>
+        </a>
+        <a href="#" class="nav-item" data-page="services">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Servicios</span>
+        </a>
+        <a href="#" class="nav-item" data-page="exchange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            <span>Divisas</span>
+        </a>
+        <a href="#" class="nav-item" data-page="card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+            <span>Tarjeta</span>
+        </a>
+    </nav>
+
+    <script>
+        // Navegación
+        const navItems = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page');
+        const paymentMenu = document.querySelector('.payment-menu');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageName = item.getAttribute('data-page');
+                
+                // Actualizar navegación
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Mostrar página correspondiente
+                pages.forEach(page => page.classList.remove('active'));
+                const targetPage = document.getElementById(`${pageName}-page`);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+
+                // Mostrar menú de pagos si es la página de pagos
+                if (pageName === 'payments') {
+                    paymentMenu.classList.add('active');
+                } else {
+                    paymentMenu.classList.remove('active');
+                }
+            });
+        });
+
+        // Cerrar el menú de pagos al hacer clic fuera de él
+        document.addEventListener('click', (e) => {
+            if (!paymentMenu.contains(e.target) && 
+                !e.target.closest('[data-page="payments"]')) {
+                paymentMenu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
