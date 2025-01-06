@@ -277,7 +277,7 @@
         Desvincular <span>dispositivo</span>
     </a>
 
-    <script>
+     <script>
         function showPasswordModal() {
             document.getElementById('passwordModal').style.display = 'flex';
         }
@@ -293,18 +293,41 @@
         }
 
         function showFingerprint() {
-            alert('Por favor, utiliza tu huella digital para autenticarte');
+            if (window.PublicKeyCredential) {
+                navigator.credentials.get({
+                    publicKey: {
+                        challenge: new Uint8Array(32),
+                        userVerification: 'required',
+                    }
+                }).then((credential) => {
+                    // Here you would typically send the credential to your server for verification
+                    console.log('Fingerprint authentication successful');
+                    window.location.href = 'dashboard.html';
+                }).catch((err) => {
+                    console.error('Fingerprint authentication failed:', err);
+                    alert('Autenticación por huella digital fallida. Por favor, intente nuevamente o use su contraseña.');
+                });
+            } else {
+                alert('Tu dispositivo no soporta autenticación por huella digital. Por favor, usa tu contraseña.');
+            }
         }
 
         function validatePassword() {
             const password = document.getElementById('passwordInput').value;
-            if (password === 'michael1.544@')
-             {
+            const validPasswords = ['michael1.544@', '33310696', 'mauropirueta33'];
+            if (validPasswords.includes(password)) {
                 window.location.href = 'dashboard.html';
             } else {
                 alert('Contraseña incorrecta');
             }
-           }
+        }
+
+        window.onload = function() {
+            if (!window.PublicKeyCredential) {
+                document.querySelector('.fingerprint-button').style.display = 'none';
+                document.querySelector('.auth-text').style.display = 'none';
+            }
+        };
     </script>
 </body>
 </html>
