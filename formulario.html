@@ -381,7 +381,7 @@
                     </select>
 
                     <div class="document-container">
-                        <input type="text" class="form-control" name="document" placeholder="Documento:" required>
+                        <input type="tel" class="form-control" name="document" placeholder="Documento:" required inputmode="numeric" pattern="[0-9]*">
                         <div class="search-icon">
                             <img src="https://i.postimg.cc/tYkRM65p/persona.png" alt="Search">
                         </div>
@@ -419,7 +419,7 @@
                     </select>
 
                     <input type="tel" class="form-control" name="phone" placeholder="Teléfono:" required>
-                    <input type="text" class="form-control" name="amount" placeholder="Monto:" required>
+                    <input type="tel" class="form-control" name="amount" placeholder="Monto:" required inputmode="decimal">
                     <input type="text" class="form-control" name="concept" placeholder="Concepto:" required>
 
                     <div class="button-group">
@@ -591,15 +591,8 @@
 
         document.querySelector('input[name="amount"]').addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^\d,]/g, '');
-            if (value) {
-                value = value.replace(/^(\d+,?\d{0,2}).*/, '$1');
-                e.target.value = value;
-            }
+            e.target.value = value;
         });
     </script>
 </body>
 </html>
-
-
-
-
