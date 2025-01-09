@@ -46,6 +46,9 @@
             font-size: 1.2rem;
             font-weight: 500;
             color: #333;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
         }
 
         .qr-section {
@@ -182,11 +185,11 @@
         }
 
         /* Receipt View Styles */
-        #formView, #receiptView {
+        #formView, #confirmView, #receiptView {
             display: none;
         }
 
-        #formView.active, #receiptView.active {
+        #formView.active, #confirmView.active, #receiptView.active {
             display: block;
         }
 
@@ -221,11 +224,17 @@
         .app-name {
             font-size: 1.000rem;
             margin-bottom: 0.4rem;
-            align-items: center;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+        }
+        .receipt-content .app-name {
+            color: black;
+            font-weight: normal;
         }
 
         .checkmark {
-            width: 1.40rem;  /* Made slightly smaller */
+            width: 1.40rem;
             height: 1.40rem;
             background-color: #c82d2d;
             border-radius: 50%;
@@ -352,6 +361,53 @@
             display: none;
             z-index: 1000;
         }
+
+        /* Confirmation View Styles */
+        .confirm-content {
+            padding: 1rem;
+        }
+
+        .confirm-amount {
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .confirm-details {
+            margin-bottom: 2rem;
+        }
+
+        .confirm-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .confirm-label {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .confirm-value {
+            font-weight: normal;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: center;
+            background-color: #1368b0;
+            color: white;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -457,6 +513,37 @@
             </nav>
         </div>
 
+        <!-- Confirmation View -->
+        <div id="confirmView">
+            <header class="header">
+                <span class="header-title">Confirmar Operación</span>
+                <img src="https://i.postimg.cc/gcM88DZk/imagen-2025-01-09-012658261.png" alt="Cerrar" class="icon" onclick="showFormView()" style="position: absolute; right: 1rem; width: 24px; height: 24px;">
+            </header>
+            <div class="confirm-content">
+                <div class="app-name">PagomóvilBDV Personas</div>
+                <div class="confirm-amount" id="confirmAmount"></div>
+                <div class="confirm-details">
+                    <div class="confirm-row">
+                        <span class="confirm-label">Identificación:</span>
+                        <span class="confirm-value" id="confirmDocument"></span>
+                    </div>
+                    <div class="confirm-row">
+                        <span class="confirm-label">Destino:</span>
+                        <span class="confirm-value" id="confirmPhone"></span>
+                    </div>
+                    <div class="confirm-row">
+                        <span class="confirm-label">Banco:</span>
+                        <span class="confirm-value" id="confirmBank"></span>
+                    </div>
+                    <div class="confirm-row">
+                        <span class="confirm-label">Concepto:</span>
+                        <span class="confirm-value" id="confirmConcept"></span>
+                    </div>
+                </div>
+                <button class="confirm-btn" onclick="confirmPayment()">Confirmar</button>
+            </div>
+        </div>
+
         <!-- Receipt View -->
         <div id="receiptView">
             <header class="receipt-header">
@@ -553,16 +640,35 @@
 
         function showFormView() {
             document.getElementById('formView').classList.add('active');
+            document.getElementById('confirmView').classList.remove('active');
+            document.getElementById('receiptView').classList.remove('active');
+        }
+
+        function showConfirmView() {
+            document.getElementById('formView').classList.remove('active');
+            document.getElementById('confirmView').classList.add('active');
             document.getElementById('receiptView').classList.remove('active');
         }
 
         function showReceiptView() {
             document.getElementById('formView').classList.remove('active');
+            document.getElementById('confirmView').classList.remove('active');
             document.getElementById('receiptView').classList.add('active');
         }
 
         function clearForm() {
             document.getElementById('paymentForm').reset();
+        }
+
+        function confirmPayment() {
+            // Generate random operation and origin numbers
+            document.getElementById('receiptOperation').value = generateRandomOperation();
+            document.getElementById('receiptOrigin').value = generateRandomOrigin();
+
+            // Set the date
+            document.getElementById('receiptDate').value = new Date().toLocaleDateString();
+
+            showReceiptView();
         }
 
         document.getElementById('paymentForm').addEventListener('submit', function(e) {
@@ -573,20 +679,21 @@
             const bankSelect = document.querySelector('select[name="bank"]');
             const selectedBank = bankSelect.options[bankSelect.selectedIndex].text;
             
+            // Update confirmation view
+            document.getElementById('confirmAmount').textContent = formData.get('amount') + ' Bs';
+            document.getElementById('confirmDocument').textContent = formData.get('document');
+            document.getElementById('confirmPhone').textContent = formData.get('phone');
+            document.getElementById('confirmBank').textContent = selectedBank;
+            document.getElementById('confirmConcept').textContent = formData.get('concept');
+            
+            // Update receipt view
             document.getElementById('receiptAmount').value = formData.get('amount') + ' Bs';
-            document.getElementById('receiptDate').value = new Date().toLocaleDateString();
             document.getElementById('receiptDocument').value = formData.get('document');
             document.getElementById('receiptPhone').value = formData.get('phone');
             document.getElementById('receiptBank').value = selectedBank;
             document.getElementById('receiptConcept').value = formData.get('concept');
-            
-            // Generate and set a random operation number
-            document.getElementById('receiptOperation').value = generateRandomOperation();
 
-            // Generate and set a random origin number
-            document.getElementById('receiptOrigin').value = generateRandomOrigin();
-
-            showReceiptView();
+            showConfirmView();
         });
 
         document.querySelector('input[name="amount"]').addEventListener('input', function(e) {
@@ -596,3 +703,4 @@
     </script>
 </body>
 </html>
+
