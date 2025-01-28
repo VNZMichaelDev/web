@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -306,6 +306,16 @@
             justify-content: center;
             color: #666;
         }
+
+        .editable-amount {
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: right;
+            width: 100%;
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -385,34 +395,8 @@
                 <button class="update-button">Actualizar</button>
             </div>
 
-            <div class="transactions">
-                <div class="transaction">
-                    <div class="transaction-date">LUNES, 13 DE ENERO</div>
-                    <div class="transaction-details">
-                        <div class="transaction-info">
-                            <span class="transaction-arrow">→</span>
-                            <span class="transaction-type">Transferencias a terceros BDV</span>
-                        </div>
-                        <div class="transaction-amount">
-                            <div class="amount">2.061,60 Bs</div>
-                            <div class="time">03:35 PM</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="transaction">
-                    <div class="transaction-date">MARTES, 17 DE DICIEMBRE</div>
-                    <div class="transaction-details">
-                        <div class="transaction-info">
-                            <span class="transaction-arrow">←</span>
-                            <span class="transaction-type">Transferencias a terceros BDV</span>
-                        </div>
-                        <div class="transaction-amount">
-                            <div class="amount">1.850,00 Bs</div>
-                            <div class="time">01:51 PM</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Más transacciones aquí -->
+            <div class="transactions" id="transactions">
+                <!-- Las transacciones se agregarán dinámicamente aquí -->
             </div>
         </div>
     </div>
@@ -527,6 +511,74 @@
                 paymentMenu.classList.remove('active');
             }
         });
+
+        // Función para formatear la fecha
+        function formatDate(date) {
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            return date.toLocaleDateString('es-ES', options).toUpperCase();
+        }
+
+        // Función para formatear la hora
+        function formatTime(date) {
+            return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Función para crear una nueva transacción
+        function createTransaction(date, type, amount, direction) {
+            const transaction = document.createElement('div');
+            transaction.className = 'transaction';
+            transaction.innerHTML = `
+                <div class="transaction-date">${formatDate(date)}</div>
+                <div class="transaction-details">
+                    <div class="transaction-info">
+                        <span class="transaction-arrow">${direction === 'in' ? '←' : '→'}</span>
+                        <span class="transaction-type">${type}</span>
+                    </div>
+                    <div class="transaction-amount">
+                        <div class="amount" onclick="makeEditable(this)">${amount.toFixed(2)} Bs</div>
+                        <div class="time">${formatTime(date)}</div>
+                    </div>
+                </div>
+            `;
+            return transaction;
+        }
+
+        // Función para hacer editable el monto
+        function makeEditable(element) {
+            const currentAmount = parseFloat(element.textContent);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = '0.01';
+            input.value = currentAmount;
+            input.className = 'editable-amount';
+            input.onblur = function() {
+                element.textContent = parseFloat(this.value).toFixed(2) + ' Bs';
+            };
+            element.textContent = '';
+            element.appendChild(input);
+            input.focus();
+        }
+
+        // Agregar transacciones existentes
+        const transactionsContainer = document.getElementById('transactions');
+        const existingTransactions = [
+            { date: new Date(2023, 0, 13), type: 'Transferencias a terceros BDV', amount: 2061.60, direction: 'out' },
+            { date: new Date(2022, 11, 17), type: 'Transferencias a terceros BDV', amount: 1850.00, direction: 'in' }
+        ];
+
+        existingTransactions.forEach(transaction => {
+            transactionsContainer.appendChild(createTransaction(
+                transaction.date,
+                transaction.type,
+                transaction.amount,
+                transaction.direction
+            ));
+        });
+
+        // Agregar nueva transacción con fecha y hora actuales
+        const now = new Date();
+        const newTransaction = createTransaction(now, 'PTransferencias a terceros BDV', 755.00, 'out');
+        transactionsContainer.insertBefore(newTransaction, transactionsContainer.firstChild);
     </script>
 </body>
 </html>
