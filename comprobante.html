@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante de Pago</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 60px;
+        }
+
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .receipt-header h1 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .receipt-content {
+            padding: 1.3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-name {
+            font-size: 1.000rem;
+            margin-bottom: 0.4rem;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .checkmark {
+            width: 1.40rem;
+            height: 1.40rem;
+            background-color: #c82d2d;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.90rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .amount {
+            width: 90%;
+            background-color: #f8f8f8;
+            padding: 1rem;
+            border-radius: 1.1rem;
+            text-align: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .amount-input {
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            text-align: center;
+            width: 100%;
+            outline: none;
+        }
+
+        .details {
+            width: 96%;
+            margin-bottom: 4rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .detail-label {
+            color: black;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #6b7280;
+            border: none;
+            background: transparent;
+            text-align: right;
+            outline: none;
+            min-width: 200px;
+        }
+
+        .copy-icon {
+            width: 20px;
+            height: 20px;
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+
+        .back-arrow {
+            width: 30px;
+            height: 30px;
+            display: block;
+            margin: 2rem auto;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="toast" class="toast"></div>
+        
+        <div id="loading" class="loading">
+            <p>Cargando comprobante...</p>
+        </div>
+        
+        <div id="receiptView" style="display: none;">
+            <header class="receipt-header">
+                <img src="https://i.postimg.cc/gw6Wb0J1/back-arrow.png" alt="Atrás" class="icon" onclick="window.history.back()">
+                <h1>Comprobante de operación</h1>
+                <img src="https://i.postimg.cc/PvKGQp3v/share.png" alt="Compartir" class="icon" onclick="shareReceipt()">
+            </header>
+            <main class="receipt-content">
+                <img src="https://i.postimg.cc/xJDSfSN8/logo.png" alt="logo" class="logo">
+                <div class="app-name">PagomóvilBDV Personas</div>                                      
+                <div class="checkmark">✓</div>
+                <div class="amount">
+                    <input type="text" class="amount-input" id="receiptAmount" readonly />
+                </div>
+                <div class="details">
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha:</span>
+                        <input type="text" id="receiptDate" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Operación:</span>
+                        <div style="display: flex; align-items: center;">
+                            <input type="text" id="receiptOperation" class="detail-value" readonly />
+                            <img src="https://i.postimg.cc/ftcQkgYK/clipboard.png" alt="Copiar" class="copy-icon" onclick="copyOperation()">
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Identificación:</span>
+                        <input type="text" id="receiptDocument" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Origen:</span>
+                        <input type="text" id="receiptOrigin" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Destino:</span>
+                        <input type="text" id="receiptPhone" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Banco:</span>
+                        <input type="text" id="receiptBank" class="detail-value" readonly />
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Concepto:</span>
+                        <input type="text" id="receiptConcept" class="detail-value" readonly />
+                    </div>
+                </div>
+
+                <img src="https://i.postimg.cc/xN9DmyRS/red-arrow.png" alt="Atrás" class="back-arrow" onclick="window.history.back()">
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { obtenerTransaccion } from './js/transacciones.js';
+
+        // Función para mostrar un mensaje toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Función para copiar el número de operación
+        window.copyOperation = function() {
+            const operationInput = document.getElementById('receiptOperation');
+            navigator.clipboard.writeText(operationInput.value)
+                .then(() => showToast('Número de operación copiado al portapapeles'))
+                .catch(err => console.error('Error al copiar:', err));
+        };
+
+        // Función para compartir el comprobante
+        window.shareReceipt = function() {
+            const amount = document.querySelector('.amount-input').value;
+            showToast(`El Pago Fue Exitoso ${amount}`);
+        };
+
+        // Función para obtener parámetros de la URL
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Función para formatear la fecha
+        function formatDate(date) {
+            return date.toLocaleDateString();
+        }
+
+        // Cargar los datos del comprobante
+        async function cargarComprobante() {
+            const id = getUrlParameter('id');
+            
+            if (!id) {
+                showToast('ID de transacción no proporcionado');
+                window.history.back();
+                return;
+            }
+            
+            try {
+                const transaccion = await obtenerTransaccion(id);
+                
+                if (!transaccion) {
+                    showToast('Transacción no encontrada');
+                    window.history.back();
+                    return;
+                }
+                
+                // Llenar los datos del comprobante
+                document.getElementById('receiptAmount').value = `${Math.abs(transaccion.monto).toFixed(2)} Bs`;
+                document.getElementById('receiptDate').value = formatDate(new Date(transaccion.fecha));
+                document.getElementById('receiptOperation').value = transaccion.id;
+                document.getElementById('receiptDocument').value = transaccion.documento || 'N/A';
+                document.getElementById('receiptOrigin').value = transaccion.origen || '0102****8620';
+                document.getElementById('receiptPhone').value = transaccion.telefono_destino || 'N/A';
+                document.getElementById('receiptBank').value = transaccion.banco_destino || 'N/A';
+                document.getElementById('receiptConcept').value = transaccion.concepto || 'N/A';
+                
+                // Mostrar el comprobante
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('receiptView').style.display = 'block';
+            } catch (error) {
+                console.error('Error al cargar el comprobante:', error);
+                showToast('Error al cargar el comprobante');
+                window.history.back();
+            }
+        }
+        
+        // Cargar el comprobante cuando se carga la página
+        document.addEventListener('DOMContentLoaded', cargarComprobante);
+    </script>
+</body>
+</html>

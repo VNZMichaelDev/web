@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimientos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f8f8f8;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            background: white;
+        }
+
+        .back-button {
+            font-size: 24px;
+            text-decoration: none;
+            color: #000;
+            margin-right: 16px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .search-container {
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            background: white;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            font-size: 16px;
+            background-color: #fff;
+        }
+
+        .search-button, .filter-button {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            background-color: #0066b3;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .date-group {
+            background-color: #f8f8f8;
+            padding: 8px 16px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .transaction {
+            padding: 16px;
+            display: flex;
+            background: #f8f8f8;
+        }
+
+        .transaction-icon {
+            width: 24px;
+            margin-right: 12px;
+            color: #0066b3;
+            padding-top: 2px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-description {
+            font-size: 14px;
+        }
+
+        .transaction-right {
+            text-align: right;
+        }
+
+        .transaction-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .transaction-amount {
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .amount-green {
+            color: #28a745;
+        }
+
+        .amount-input {
+            font-size: 16px;
+            font-weight: 500;
+            width: 120px;
+            padding: 2px 4px;
+            border: 1px solid #0066b3;
+            border-radius: 4px;
+            text-align: right;
+        }
+
+        /* Ocultar flechas del input number */
+        .amount-input::-webkit-outer-spin-button,
+        .amount-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .amount-input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="dashboard.html" class="back-button">←</a>
+            <h1 class="title">Movimientos</h1>
+        </header>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Buscar ....">
+            <button class="search-button">🔍</button>
+            <button class="filter-button">▼</button>
+        </div>
+
+        <div id="transactions-container">
+            <!-- Las transacciones se generarán dinámicamente aquí -->
+        </div>
+    </div>
+
+    <script>
+        // Función para formatear la fecha en español
+        function formatDateSpanish(date) {
+            const days = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+            const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+            
+            const dayName = days[date.getDay()];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            
+            return `${dayName}, ${day} DE ${month}`;
+        }
+
+        // Función para formatear la hora en formato 12 horas
+        function formatTimeSpanish(date) {
+            let hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // La hora '0' debe ser '12'
+            
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+            
+            return `${hours}:${formattedMinutes} ${ampm}`;
+        }
+
+        // Obtener la fecha y hora actual
+        const now = new Date();
+        const today = formatDateSpanish(now);
+        const currentTime = formatTimeSpanish(now);
+
+        // Datos de las transacciones
+        const transactionsData = {
+            groups: [
+                {
+                    date: today,
+                    transactions: [
+                        {
+                            type: "debit",
+                            description: "Transferencia a terceros BDV",
+                            amount: 755.00,
+                            time: currentTime,
+                            isGreen: false
+                        }
+                    ]
+                },
+                {
+                    date: "AYER",
+                    transactions: [
+                        {
+                            type: "debit",
+                            description: "Compra con tarjeta de debito",
+                            amount: 150.00,
+                            time: "08:11 AM",
+                            isGreen: false
+                        }
+                    ]
+                },
+                {
+                    date: "SÁBADO, 22 DE FEBRERO",
+                    transactions: [
+                        {
+                            type: "debit",
+                            description: "Compra con tarjeta de debito",
+                            amount: 41.60,
+                            time: "05:06 PM",
+                            isGreen: false
+                        },
+                        {
+                            type: "credit",
+                            description: "Operacion pagomovil bdv",
+                            amount: 45.00,
+                            time: "04:44 PM",
+                            isGreen: true
+                        }
+                    ]
+                },
+                {
+                    date: "VIERNES, 21 DE FEBRERO",
+                    transactions: [
+                        {
+                            type: "debit",
+                            description: "Pago movilnet prepago",
+                            amount: 60.00,
+                            time: "09:33 PM",
+                            isGreen: false
+                        },
+                        {
+                            type: "debit",
+                            description: "Pago movilnet prepago",
+                            amount: 180.00,
+                            time: "09:32 PM",
+                            isGreen: false
+                        },
+                        {
+                            type: "debit",
+                            description: "Compra con tarjeta de debito",
+                            amount: 170.00,
+                            time: "05:32 PM",
+                            isGreen: false
+                        },
+                        {
+                            type: "credit",
+                            description: "Operacion pagomovil bdv",
+                            amount: 160.00,
+                            time: "04:23 PM",
+                            isGreen: true
+                        },
+                        {
+                            type: "debit",
+                            description: "Compra con tarjeta de debito",
+                            amount: 74.88,
+                            time: "01:10 PM",
+                            isGreen: false
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Función para formatear montos
+        function formatAmount(amount) {
+            return amount.toFixed(2).replace('.', ',') + " Bs";
+        }
+
+        // Función para generar el HTML de las transacciones
+        function generateTransactionsHTML() {
+            const container = document.getElementById('transactions-container');
+            let html = '';
+
+            transactionsData.groups.forEach((group, groupIndex) => {
+                html += `
+                    <div class="date-group">${group.date}</div>
+                    ${group.transactions.map((transaction, transactionIndex) => `
+                        <div class="transaction">
+                            <div class="transaction-icon">${transaction.type === 'debit' ? '◀' : '▶'}</div>
+                            <div class="transaction-details">
+                                <div class="transaction-description">${transaction.description}</div>
+                            </div>
+                            <div class="transaction-right">
+                                <div class="transaction-amount ${transaction.isGreen ? 'amount-green' : ''}" 
+                                     onclick="editAmount(${groupIndex}, ${transactionIndex})" 
+                                     id="amount-${groupIndex}-${transactionIndex}">
+                                    ${formatAmount(transaction.amount)}
+                                </div>
+                                <div class="transaction-time">${transaction.time}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Función para editar el monto
+        function editAmount(groupIndex, transactionIndex) {
+            const amountElement = document.getElementById(`amount-${groupIndex}-${transactionIndex}`);
+            const currentAmount = transactionsData.groups[groupIndex].transactions[transactionIndex].amount;
+            const isGreen = transactionsData.groups[groupIndex].transactions[transactionIndex].isGreen;
+            
+            // Crear input
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = '0.01';
+            input.value = currentAmount;
+            input.className = `amount-input ${isGreen ? 'amount-green' : ''}`;
+
+            // Reemplazar el texto con el input
+            amountElement.innerHTML = '';
+            amountElement.appendChild(input);
+            input.focus();
+
+            // Manejar la finalización de la edición
+            function finishEdit() {
+                const newAmount = parseFloat(input.value) || currentAmount;
+                transactionsData.groups[groupIndex].transactions[transactionIndex].amount = newAmount;
+                generateTransactionsHTML();
+            }
+
+            // Eventos para finalizar la edición
+            input.addEventListener('blur', finishEdit);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    finishEdit();
+                }
+            });
+        }
+
+        // Inicializar la vista
+        generateTransactionsHTML();
+
+        // Automáticamente abrir el editor de monto para la transacción más reciente
+        window.onload = function() {
+            // Pequeño retraso para asegurar que el DOM está completamente cargado
+            setTimeout(() => {
+                // Editar el monto de la primera transacción del primer grupo (la más reciente)
+                editAmount(0, 0);
+            }, 500);
+        };
+    </script>
+    <script type="module" src="js/movimientos.js"></script>
+</body>
+</html>
