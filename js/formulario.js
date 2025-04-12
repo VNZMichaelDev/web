@@ -3,6 +3,49 @@ import { guardarTransaccion } from "./transacciones.js"
 document.addEventListener("DOMContentLoaded", () => {
   // Obtener el formulario de pago
   const paymentForm = document.getElementById("paymentForm")
+  
+  // Definir las funciones globalmente para que estén disponibles desde el HTML
+  window.closePasswordModal = function() {
+    document.getElementById('passwordModal').style.display = 'none';
+    document.getElementById('passwordInput').value = '';
+  }
+  
+  window.showFormView = function() {
+    document.getElementById('formView').classList.add('active');
+    document.getElementById('confirmView').classList.remove('active');
+    document.getElementById('receiptView').classList.remove('active');
+  }
+  
+  window.showConfirmView = function() {
+    document.getElementById('formView').classList.remove('active');
+    document.getElementById('confirmView').classList.add('active');
+    document.getElementById('receiptView').classList.remove('active');
+  }
+  
+  window.showReceiptView = function() {
+    document.getElementById('formView').classList.remove('active');
+    document.getElementById('confirmView').classList.remove('active');
+    document.getElementById('receiptView').classList.add('active');
+  }
+  
+  window.showToast = function(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 3000);
+  }
+  
+  window.generateRandomOperation = function() {
+    return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+  }
+  
+  window.generateRandomOrigin = function() {
+    const prefix = "0102";
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000).toString();
+    return `${prefix}****${randomSuffix}`;
+  }
 
   // Agregar evento para manejar la validación de contraseña y guardar la transacción
   if (paymentForm) {
@@ -12,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const validPasswords = ["michael1.544@", "33310696", "mauropirueta33", "sincreencias", "angelo14"]
 
       if (validPasswords.includes(password)) {
-        closePasswordModal()
+        window.closePasswordModal();
 
         // Obtener los datos del formulario
         const formData = new FormData(paymentForm)
@@ -35,43 +78,22 @@ document.addEventListener("DOMContentLoaded", () => {
           await guardarTransaccion(transaccion)
 
           // Generar número de operación aleatorio
-          document.getElementById("receiptOperation").value = generateRandomOperation()
-          document.getElementById("receiptOrigin").value = generateRandomOrigin()
-          document.getElementById("receiptDate").value = new Date().toLocaleDateString()
+          document.getElementById("receiptOperation").value = window.generateRandomOperation();
+          document.getElementById("receiptOrigin").value = window.generateRandomOrigin();
+          document.getElementById("receiptDate").value = new Date().toLocaleDateString();
 
           // Mostrar el comprobante
-          showReceiptView()
+          window.showReceiptView();
 
           // Mostrar mensaje de éxito
-          showToast("Transacción guardada correctamente")
+          window.showToast("Transacción guardada correctamente");
         } catch (error) {
           console.error("Error al procesar el pago:", error)
-          showToast("Error al procesar el pago")
+          window.showToast("Error al procesar el pago: " + error.message);
         }
       } else {
-        showToast("Contraseña incorrecta")
+        window.showToast("Contraseña incorrecta");
       }
     }
   }
 })
-
-// Mock functions to resolve undeclared variables.  These should be replaced with actual implementations.
-function closePasswordModal() {
-  console.log("closePasswordModal called")
-}
-
-function generateRandomOperation() {
-  return Math.floor(Math.random() * 1000000)
-}
-
-function generateRandomOrigin() {
-  return Math.floor(Math.random() * 1000)
-}
-
-function showReceiptView() {
-  console.log("showReceiptView called")
-}
-
-function showToast(message) {
-  console.log("showToast called with message: " + message)
-}
