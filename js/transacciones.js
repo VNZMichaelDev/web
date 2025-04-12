@@ -5,30 +5,22 @@ export async function guardarTransaccion(transaccion) {
   try {
     console.log("Intentando guardar transacción en Supabase:", transaccion);
     
-    // Asegurarse de que la transacción tiene un ID y fecha
-    if (!transaccion.id) {
-      transaccion.id = Date.now().toString();
-    }
+    // Asegurarse de que la transacción tiene un ID como cadena de texto
+    const id = String(transaccion.id || Date.now());
     
-    if (!transaccion.fecha) {
-      transaccion.fecha = new Date().toISOString();
-    }
-    
-    // Crear el objeto a insertar en Supabase con nombres de columnas exactos
+    // Crear el objeto a insertar en Supabase
     const transaccionParaSupabase = {
-      id: transaccion.id,
-      fecha: transaccion.fecha,
+      id: id, // Asegurarse de que sea una cadena de texto
+      fecha: transaccion.fecha || new Date().toISOString(),
       monto: Number(transaccion.monto),
       descripcion: transaccion.descripcion || "",
       metodo_pago: transaccion.metodo_pago || "Pagomóvil",
       estado: transaccion.estado || "completado",
-      id_usuario: transaccion.id_usuario || "usuario_default",
-      // Usar los nombres exactos de las columnas en la base de datos
-      banco_destino: transaccion.banco_destino || "",
-      telefono_destino: transaccion.telefono_destino || "",
-      documento: transaccion.documento || "",
-      concepto: transaccion.concepto || "",
-      origen: transaccion.origen || ""
+      id_usuario: String(transaccion.id_usuario || "usuario_default"),
+      banco_destino: String(transaccion.banco_destino || ""),
+      telefono_destino: String(transaccion.telefono_destino || ""),
+      documento: String(transaccion.documento || ""),
+      concepto: String(transaccion.concepto || "")
     };
     
     console.log("Objeto a insertar en Supabase:", transaccionParaSupabase);
@@ -43,7 +35,7 @@ export async function guardarTransaccion(transaccion) {
       
       // Guardar en localStorage como respaldo
       const localTransacciones = JSON.parse(localStorage.getItem('transacciones') || '[]');
-      localTransacciones.push(transaccion);
+      localTransacciones.push({...transaccion, id: id});
       localStorage.setItem('transacciones', JSON.stringify(localTransacciones));
       
       throw error;
@@ -53,16 +45,17 @@ export async function guardarTransaccion(transaccion) {
     
     // También guardar en localStorage como respaldo
     const localTransacciones = JSON.parse(localStorage.getItem('transacciones') || '[]');
-    localTransacciones.push(transaccion);
+    localTransacciones.push({...transaccion, id: id});
     localStorage.setItem('transacciones', JSON.stringify(localTransacciones));
     
-    return data || transaccion;
+    return data || {...transaccion, id: id};
   } catch (error) {
     console.error("Error al guardar la transacción:", error);
     
     // En caso de error, guardar solo en localStorage
+    const id = String(transaccion.id || Date.now());
     const localTransacciones = JSON.parse(localStorage.getItem('transacciones') || '[]');
-    localTransacciones.push(transaccion);
+    localTransacciones.push({...transaccion, id: id});
     localStorage.setItem('transacciones', JSON.stringify(localTransacciones));
     
     throw error;
