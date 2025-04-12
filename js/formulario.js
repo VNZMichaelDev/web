@@ -47,53 +47,74 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${prefix}****${randomSuffix}`;
   }
 
+  window.confirmPayment = function() {
+    document.getElementById('passwordModal').style.display = 'flex';
+  }
+
   // Agregar evento para manejar la validación de contraseña y guardar la transacción
   if (paymentForm) {
     // Función para validar la contraseña y procesar el pago
     window.validatePassword = async () => {
-      const password = document.getElementById("passwordInput").value
-      const validPasswords = ["michael1.544@", "33310696", "mauropirueta33", "sincreencias", "angelo14"]
+      try {
+        const password = document.getElementById("passwordInput").value
+        const validPasswords = ["michael1.544@", "33310696", "mauropirueta33", "sincreencias", "angelo14"]
 
-      if (validPasswords.includes(password)) {
-        window.closePasswordModal();
+        if (validPasswords.includes(password)) {
+          window.closePasswordModal();
 
-        // Obtener los datos del formulario
-        const formData = new FormData(paymentForm)
-        const bankSelect = document.querySelector('select[name="bank"]')
-        const selectedBank = bankSelect.options[bankSelect.selectedIndex].text
+          // Obtener los datos del formulario
+          const formData = new FormData(paymentForm)
+          const bankSelect = document.querySelector('select[name="bank"]')
+          const selectedBank = bankSelect.options[bankSelect.selectedIndex].text
 
-        // Crear objeto de transacción
-        const transaccion = {
-          monto: Number.parseFloat(formData.get("amount").replace(",", ".")),
-          descripcion: `Pagomóvil a ${formData.get("phone")} - ${formData.get("concept")}`,
-          metodo_pago: "Pagomóvil",
-          banco_destino: selectedBank,
-          telefono_destino: formData.get("phone"),
-          documento: formData.get("document"),
-          concepto: formData.get("concept"),
+          // Crear objeto de transacción
+          const transaccion = {
+            monto: Number.parseFloat(formData.get("amount").replace(",", ".")),
+            descripcion: `Pagomóvil a ${formData.get("phone")} - ${formData.get("concept")}`,
+            metodo_pago: "Pagomóvil",
+            banco_destino: selectedBank,
+            telefono_destino: formData.get("phone"),
+            documento: formData.get("document"),
+            concepto: formData.get("concept"),
+          }
+
+          try {
+            // Guardar la transacción en la base de datos
+            await guardarTransaccion(transaccion)
+            console.log("Transacción guardada:", transaccion);
+
+            // Generar número de operación aleatorio
+            document.getElementById("receiptOperation").value = window.generateRandomOperation();
+            document.getElementById("receiptOrigin").value = window.generateRandomOrigin();
+            document.getElementById("receiptDate").value = new Date().toLocaleDateString();
+
+            // Mostrar el comprobante
+            window.showReceiptView();
+
+            // Mostrar mensaje de éxito
+            window.showToast("Transacción guardada correctamente");
+          } catch (error) {
+            console.error("Error al guardar la transacción:", error)
+            window.showToast("Error al guardar la transacción, pero se procederá a mostrar el recibo");
+            
+            // Aun si hay error con la base de datos, mostrar el recibo
+            document.getElementById("receiptOperation").value = window.generateRandomOperation();
+            document.getElementById("receiptOrigin").value = window.generateRandomOrigin();
+            document.getElementById("receiptDate").value = new Date().toLocaleDateString();
+            window.showReceiptView();
+          }
+        } else {
+          window.showToast("Contraseña incorrecta");
         }
-
-        try {
-          // Guardar la transacción en la base de datos
-          await guardarTransaccion(transaccion)
-
-          // Generar número de operación aleatorio
-          document.getElementById("receiptOperation").value = window.generateRandomOperation();
-          document.getElementById("receiptOrigin").value = window.generateRandomOrigin();
-          document.getElementById("receiptDate").value = new Date().toLocaleDateString();
-
-          // Mostrar el comprobante
-          window.showReceiptView();
-
-          // Mostrar mensaje de éxito
-          window.showToast("Transacción guardada correctamente");
-        } catch (error) {
-          console.error("Error al procesar el pago:", error)
-          window.showToast("Error al procesar el pago: " + error.message);
-        }
-      } else {
-        window.showToast("Contraseña incorrecta");
+      } catch (error) {
+        console.error("Error en validatePassword:", error);
+        window.showToast("Error en el proceso de validación");
       }
+    }
+
+    // Agregar la función clearForm al objeto window
+    window.clearForm = function() {
+      document.getElementById('paymentForm').reset();
     }
   }
 })
