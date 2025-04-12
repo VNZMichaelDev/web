@@ -14,19 +14,21 @@ export async function guardarTransaccion(transaccion) {
       transaccion.fecha = new Date().toISOString();
     }
     
-    // Crear el objeto a insertar en Supabase
+    // Crear el objeto a insertar en Supabase con nombres de columnas exactos
     const transaccionParaSupabase = {
       id: transaccion.id,
-      monto: transaccion.monto,
-      descripcion: transaccion.descripcion,
+      fecha: transaccion.fecha,
+      monto: Number(transaccion.monto),
+      descripcion: transaccion.descripcion || "",
       metodo_pago: transaccion.metodo_pago || "Pagomóvil",
       estado: transaccion.estado || "completado",
       id_usuario: transaccion.id_usuario || "usuario_default",
-      banco_destino: transaccion.banco_destino,
-      telefono_destino: transaccion.telefono_destino,
-      documento: transaccion.documento,
-      concepto: transaccion.concepto,
-      fecha: transaccion.fecha
+      // Usar los nombres exactos de las columnas en la base de datos
+      banco_destino: transaccion.banco_destino || "",
+      telefono_destino: transaccion.telefono_destino || "",
+      documento: transaccion.documento || "",
+      concepto: transaccion.concepto || "",
+      origen: transaccion.origen || ""
     };
     
     console.log("Objeto a insertar en Supabase:", transaccionParaSupabase);
