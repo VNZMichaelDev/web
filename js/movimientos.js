@@ -1,5 +1,4 @@
 import { obtenerTransacciones } from "./transacciones.js"
-import { generateTransactionsHTML } from "./transacciones_ejemplo.js"
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Obtener el contenedor de transacciones
@@ -7,12 +6,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (transactionsContainer) {
     try {
-      // Obtener las transacciones de la base de datos
+      console.log("Intentando obtener transacciones para la página de movimientos...")
+      
+      // Obtener las transacciones de la base de datos o localStorage
       const transacciones = await obtenerTransacciones()
+      console.log("Transacciones obtenidas:", transacciones)
 
       if (transacciones && transacciones.length > 0) {
         // Agrupar transacciones por fecha
         const transaccionesPorFecha = agruparPorFecha(transacciones)
+        console.log("Transacciones agrupadas:", transaccionesPorFecha)
 
         // Generar el HTML de las transacciones
         let html = ""
@@ -32,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                   <div class="transaction-amount ${transaccion.monto > 0 ? "amount-green" : ""}">
                     ${formatAmount(Math.abs(transaccion.monto))}
                   </div>
-                  <div class="transaction-time">${formatTime(new Date(transaccion.fecha))}</div>
+                  <div class="transaction-time">${formatTime(new Date(transaccion.fecha || Date.now()))}</div>
                 </div>
               </div>
             `,
@@ -51,13 +54,25 @@ document.addEventListener("DOMContentLoaded", async () => {
           })
         })
       } else {
+        console.log("No se encontraron transacciones, mostrando datos de ejemplo")
         // Si no hay transacciones, mostrar las transacciones de ejemplo
-        generateTransactionsHTML()
+        // Importar dinámicamente para evitar problemas de carga
+        import("./transacciones_ejemplo.js").then(module => {
+          module.generateTransactionsHTML();
+        }).catch(error => {
+          console.error("Error al cargar transacciones de ejemplo:", error);
+          transactionsContainer.innerHTML = "<p>No hay transacciones disponibles</p>";
+        });
       }
     } catch (error) {
       console.error("Error al cargar las transacciones:", error)
       // Si hay un error, mostrar las transacciones de ejemplo
-      generateTransactionsHTML()
+      import("./transacciones_ejemplo.js").then(module => {
+        module.generateTransactionsHTML();
+      }).catch(error => {
+        console.error("Error al cargar transacciones de ejemplo:", error);
+        transactionsContainer.innerHTML = "<p>Error al cargar transacciones</p>";
+      });
     }
   }
 })
@@ -109,7 +124,8 @@ function agruparPorFecha(transacciones) {
   const grupos = {}
 
   transacciones.forEach((transaccion) => {
-    const fecha = new Date(transaccion.fecha)
+    // Asegurarse de que la fecha existe
+    const fecha = transaccion.fecha ? new Date(transaccion.fecha) : new Date()
     const fechaFormateada = formatDateSpanish(fecha)
 
     if (!grupos[fechaFormateada]) {
