@@ -14,25 +14,36 @@ export async function guardarTransaccion(transaccion) {
       transaccion.fecha = new Date().toISOString();
     }
     
+    // Crear el objeto a insertar en Supabase
+    const transaccionParaSupabase = {
+      id: transaccion.id,
+      monto: transaccion.monto,
+      descripcion: transaccion.descripcion,
+      metodo_pago: transaccion.metodo_pago || "Pagomóvil",
+      estado: transaccion.estado || "completado",
+      id_usuario: transaccion.id_usuario || "usuario_default",
+      banco_destino: transaccion.banco_destino,
+      telefono_destino: transaccion.telefono_destino,
+      documento: transaccion.documento,
+      concepto: transaccion.concepto,
+      fecha: transaccion.fecha
+    };
+    
+    console.log("Objeto a insertar en Supabase:", transaccionParaSupabase);
+    
     // Guardar en Supabase
-    const { data, error } = await supabase.from("transacciones").insert([
-      {
-        id: transaccion.id,
-        monto: transaccion.monto,
-        descripcion: transaccion.descripcion,
-        metodo_pago: transaccion.metodo_pago || "Pagomóvil",
-        estado: transaccion.estado || "completado",
-        id_usuario: transaccion.id_usuario || "usuario_default",
-        banco_destino: transaccion.banco_destino,
-        telefono_destino: transaccion.telefono_destino,
-        documento: transaccion.documento,
-        concepto: transaccion.concepto,
-        fecha: transaccion.fecha
-      },
-    ]).select();
+    const { data, error } = await supabase
+      .from("transacciones")
+      .insert([transaccionParaSupabase]);
     
     if (error) {
-      console.error("Error al guardar en Supabase:", error);
+      console.error("Error detallado al guardar en Supabase:", error);
+      
+      // Guardar en localStorage como respaldo
+      const localTransacciones = JSON.parse(localStorage.getItem('transacciones') || '[]');
+      localTransacciones.push(transaccion);
+      localStorage.setItem('transacciones', JSON.stringify(localTransacciones));
+      
       throw error;
     }
     
@@ -43,7 +54,7 @@ export async function guardarTransaccion(transaccion) {
     localTransacciones.push(transaccion);
     localStorage.setItem('transacciones', JSON.stringify(localTransacciones));
     
-    return data && data.length > 0 ? data[0] : transaccion;
+    return data || transaccion;
   } catch (error) {
     console.error("Error al guardar la transacción:", error);
     
