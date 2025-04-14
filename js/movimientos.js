@@ -25,20 +25,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="date-group">${grupo.fecha}</div>
             ${grupo.transacciones
               .map(
-                (transaccion) => `
-              <div class="transaction" data-id="${transaccion.id}">
-                <div class="transaction-icon">${transaccion.monto < 0 ? "◀" : "▶"}</div>
-                <div class="transaction-details">
-                  <div class="transaction-description">${transaccion.descripcion}</div>
-                </div>
-                <div class="transaction-right">
-                  <div class="transaction-amount ${transaccion.monto > 0 ? "amount-green" : ""}">
-                    ${formatAmount(Math.abs(transaccion.monto))}
-                  </div>
-                  <div class="transaction-time">${formatTime(new Date(transaccion.fecha || Date.now()))}</div>
-                </div>
-              </div>
-            `,
+                (transaccion) => {
+                  // Cambiar la descripción para mostrar "PagomóvilBDV" si es un pagomóvil
+                  let descripcion = transaccion.descripcion || "";
+                  if (descripcion.toLowerCase().includes("pagomovil") || transaccion.metodo_pago === "Pagomóvil") {
+                    descripcion = "PagomóvilBDV";
+                  }
+                  
+                  return `
+                    <div class="transaction" data-id="${transaccion.id}">
+                      <div class="transaction-icon">${transaccion.monto < 0 ? "◀" : "▶"}</div>
+                      <div class="transaction-details">
+                        <div class="transaction-description">${descripcion}</div>
+                      </div>
+                      <div class="transaction-right">
+                        <div class="transaction-amount">
+                          ${formatAmount(Math.abs(transaccion.monto))}
+                        </div>
+                        <div class="transaction-time">${formatTime(new Date(transaccion.fecha || Date.now()))}</div>
+                      </div>
+                    </div>
+                  `;
+                }
               )
               .join("")}
           `
@@ -55,24 +63,48 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
       } else {
         console.log("No se encontraron transacciones, mostrando datos de ejemplo")
-        // Si no hay transacciones, mostrar las transacciones de ejemplo
-        // Importar dinámicamente para evitar problemas de carga
-        import("./transacciones_ejemplo.js").then(module => {
-          module.generateTransactionsHTML();
-        }).catch(error => {
-          console.error("Error al cargar transacciones de ejemplo:", error);
-          transactionsContainer.innerHTML = "<p>No hay transacciones disponibles</p>";
-        });
+        // Si no hay transacciones, mostrar un mensaje
+        transactionsContainer.innerHTML = `
+          <div class="date-group">HOY</div>
+          <div class="transaction">
+            <div class="transaction-icon">▶</div>
+            <div class="transaction-details">
+              <div class="transaction-description">PagomóvilBDV</div>
+            </div>
+            <div class="transaction-right">
+              <div class="transaction-amount">500,00 Bs</div>
+              <div class="transaction-time">12:45 PM</div>
+            </div>
+          </div>
+          <div class="date-group">AYER</div>
+          <div class="transaction">
+            <div class="transaction-icon">◀</div>
+            <div class="transaction-details">
+              <div class="transaction-description">Compra con tarjeta de debito</div>
+            </div>
+            <div class="transaction-right">
+              <div class="transaction-amount">150,00 Bs</div>
+              <div class="transaction-time">8:11 AM</div>
+            </div>
+          </div>
+        `;
       }
     } catch (error) {
       console.error("Error al cargar las transacciones:", error)
-      // Si hay un error, mostrar las transacciones de ejemplo
-      import("./transacciones_ejemplo.js").then(module => {
-        module.generateTransactionsHTML();
-      }).catch(error => {
-        console.error("Error al cargar transacciones de ejemplo:", error);
-        transactionsContainer.innerHTML = "<p>Error al cargar transacciones</p>";
-      });
+      // Si hay un error, mostrar un mensaje
+      transactionsContainer.innerHTML = `
+        <div class="date-group">ERROR</div>
+        <div class="transaction">
+          <div class="transaction-icon">⚠️</div>
+          <div class="transaction-details">
+            <div class="transaction-description">Error al cargar transacciones</div>
+          </div>
+          <div class="transaction-right">
+            <div class="transaction-amount">--,-- Bs</div>
+            <div class="transaction-time">--:--</div>
+          </div>
+        </div>
+      `;
     }
   }
 })
@@ -82,6 +114,7 @@ function formatAmount(amount) {
   return amount.toFixed(2).replace(".", ",") + " Bs"
 }
 
+// Función para formatear la hora en formato 12 horas con AM/PM
 function formatTime(date) {
   let hours = date.getHours()
   let minutes = date.getMinutes()
