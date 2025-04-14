@@ -29,9 +29,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Crear elementos para cada transacción
         transaccionesRecientes.forEach((transaccion) => {
           const fecha = transaccion.fecha ? new Date(transaccion.fecha) : new Date();
+          
+          // Cambiar la descripción para mostrar "PagomóvilBDV" si es un pagomóvil
+          let tipo = transaccion.descripcion || "Transacción";
+          if (tipo.toLowerCase().includes("pagomovil") || transaccion.metodo_pago === "Pagomóvil") {
+            tipo = "PagomóvilBDV";
+          } else if (tipo.toLowerCase().includes("transferencia")) {
+            tipo = "Transferencias a terceros BDV";
+          }
+          
           const element = createTransaction(
             fecha,
-            transaccion.descripcion || "Transacción",
+            tipo,
             transaccion.monto,
             transaccion.monto > 0 ? "in" : "out",
             transaccion.id,
@@ -52,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Agregar transacciones existentes de ejemplo
         const existingTransactions = [
           { date: new Date(2023, 0, 13), type: 'Transferencias a terceros BDV', amount: 2061.60, direction: 'out' },
-          { date: new Date(2022, 11, 17), type: 'Transferencias a terceros BDV', amount: 1850.00, direction: 'in' }
+          { date: new Date(2022, 11, 17), type: 'PagomóvilBDV', amount: 1850.00, direction: 'in' }
         ];
 
         existingTransactions.forEach(transaction => {
@@ -82,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // En caso de error, mostrar datos de ejemplo
       const existingTransactions = [
         { date: new Date(2023, 0, 13), type: 'Transferencias a terceros BDV', amount: 2061.60, direction: 'out' },
-        { date: new Date(2022, 11, 17), type: 'Transferencias a terceros BDV', amount: 1850.00, direction: 'in' }
+        { date: new Date(2022, 11, 17), type: 'PagomóvilBDV', amount: 1850.00, direction: 'in' }
       ];
 
       existingTransactions.forEach(transaction => {
@@ -117,15 +126,18 @@ function formatDate(date) {
   return `${day}/${month}/${year}`
 }
 
-// Función para formatear la hora
+// Función para formatear la hora en formato 12 horas con AM/PM
 function formatTime(date) {
   let hours = date.getHours()
   let minutes = date.getMinutes()
+  const ampm = hours >= 12 ? "PM" : "AM"
 
-  hours = hours < 10 ? "0" + hours : hours
+  hours = hours % 12
+  hours = hours ? hours : 12 // La hora '0' debe ser '12'
+
   minutes = minutes < 10 ? "0" + minutes : minutes
 
-  return `${hours}:${minutes}`
+  return `${hours}:${minutes} ${ampm}`
 }
 
 // Función para crear una nueva transacción
