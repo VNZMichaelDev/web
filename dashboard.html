@@ -5,6 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banco App</title>
     <style>
+
+/* Estilos para el histórico de operaciones */
+.date-header {
+  background-color: #f5f5f5;
+  padding: 8px 16px;
+  color: #666;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.transaction {
+  display: flex;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  align-items: center;
+}
+
+.transaction-icon {
+  margin-right: 12px;
+  font-size: 18px;
+  color: #0066cc;
+  width: 24px;
+  text-align: center;
+}
+
+.transaction-details {
+  flex: 1;
+}
+
+.transaction-type {
+  font-size: 14px;
+  color: #333;
+}
+
+.transaction-right {
+  text-align: right;
+}
+
+.transaction-amount {
+  font-size: 16px;
+  font-weight: 500;
+  color: black;
+}
+
+.transaction-time {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Estilos para el toast */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  border-radius: 4px;
+  z-index: 1000;
+  display: none;
+}
+        
         * {
             margin: 0;
             padding: 0;
@@ -582,7 +646,34 @@
         const now = new Date();
         const newTransaction = createTransaction(now, 'Transferencias a terceros BDV', 755.00, 'out');
         transactionsContainer.insertBefore(newTransaction, transactionsContainer.firstChild);
+
+// Función para mostrar mensajes toast
+window.showToast = function(message) {
+  // Verificar si ya existe un elemento toast
+  let toast = document.getElementById('toast');
+  
+  // Si no existe, crearlo
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  
+  // Establecer el mensaje y mostrar
+  toast.textContent = message;
+  toast.style.display = 'block';
+  
+  // Ocultar después de 2 segundos
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 2000);
+};
+        
     </script>
     <script type="module" src="js/dashboard.js"></script>
+
+
+    
 </body>
 </html>
