@@ -112,10 +112,11 @@
             font-weight: 500;
             cursor: pointer;
         }
-
-        .amount-green {
-            color: #28a745;
-        }
+/* Eliminar el color verde de los montos */
+.transaction-amount.amount-green,
+.amount-green {
+  color: black !important; /* Usar !important para asegurar que se aplique */
+}
 
         .amount-input {
             font-size: 16px;
