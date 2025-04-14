@@ -26,15 +26,32 @@ document.addEventListener("DOMContentLoaded", async () => {
             ${grupo.transacciones
               .map(
                 (transaccion) => {
-                  // Cambiar la descripción para mostrar "PagomóvilBDV" si es un pagomóvil
+                  // Determinar el tipo de transacción y el icono
                   let descripcion = transaccion.descripcion || "";
+                  let iconoHTML = '';
+                  
                   if (descripcion.toLowerCase().includes("pagomovil") || transaccion.metodo_pago === "Pagomóvil") {
-                    descripcion = "PagomóvilBDV";
+                    descripcion = "Operacion pagomovil bdv";
+                    iconoHTML = '▶';
+                  } else if (descripcion.toLowerCase().includes("transferencia")) {
+                    descripcion = "Transferencias a terceros BDV";
+                    iconoHTML = '◀';
+                  } else if (descripcion.toLowerCase().includes("compra")) {
+                    descripcion = "Compra con tarjeta de debito";
+                    iconoHTML = '◀';
+                  } else if (descripcion.toLowerCase().includes("pago")) {
+                    descripcion = "Pago movilnet prepago";
+                    iconoHTML = '◀';
+                  } else {
+                    iconoHTML = transaccion.monto < 0 ? '◀' : '▶';
                   }
+                  
+                  // Determinar si es un monto positivo (para el color, aunque ahora todos son negros)
+                  const esPositivo = transaccion.monto > 0;
                   
                   return `
                     <div class="transaction" data-id="${transaccion.id}">
-                      <div class="transaction-icon">${transaccion.monto < 0 ? "◀" : "▶"}</div>
+                      <div class="transaction-icon">${iconoHTML}</div>
                       <div class="transaction-details">
                         <div class="transaction-description">${descripcion}</div>
                       </div>
@@ -63,19 +80,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
       } else {
         console.log("No se encontraron transacciones, mostrando datos de ejemplo")
-        // Si no hay transacciones, mostrar un mensaje
+        // Si no hay transacciones, mostrar datos de ejemplo
         transactionsContainer.innerHTML = `
-          <div class="date-group">HOY</div>
-          <div class="transaction">
-            <div class="transaction-icon">▶</div>
-            <div class="transaction-details">
-              <div class="transaction-description">PagomóvilBDV</div>
-            </div>
-            <div class="transaction-right">
-              <div class="transaction-amount">500,00 Bs</div>
-              <div class="transaction-time">12:45 PM</div>
-            </div>
-          </div>
           <div class="date-group">AYER</div>
           <div class="transaction">
             <div class="transaction-icon">◀</div>
@@ -84,7 +90,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
             <div class="transaction-right">
               <div class="transaction-amount">150,00 Bs</div>
-              <div class="transaction-time">8:11 AM</div>
+              <div class="transaction-time">08:11 AM</div>
+            </div>
+          </div>
+          <div class="date-group">SÁBADO, 22 DE FEBRERO</div>
+          <div class="transaction">
+            <div class="transaction-icon">◀</div>
+            <div class="transaction-details">
+              <div class="transaction-description">Compra con tarjeta de debito</div>
+            </div>
+            <div class="transaction-right">
+              <div class="transaction-amount">41,60 Bs</div>
+              <div class="transaction-time">05:06 PM</div>
+            </div>
+          </div>
+          <div class="transaction">
+            <div class="transaction-icon">▶</div>
+            <div class="transaction-details">
+              <div class="transaction-description">Operacion pagomovil bdv</div>
+            </div>
+            <div class="transaction-right">
+              <div class="transaction-amount">45,00 Bs</div>
+              <div class="transaction-time">04:44 PM</div>
             </div>
           </div>
         `;
