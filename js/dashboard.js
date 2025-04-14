@@ -47,8 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
               let iconoHTML = '';
               
               if (tipo.toLowerCase().includes("pagomovil") || transaccion.metodo_pago === "Pagomóvil") {
-                tipo = "PagomóvilBDV";
-                iconoHTML = '<span class="transaction-icon mobile">📱</span>';
+                tipo = "Transferencias a terceros BDV";
+                iconoHTML = '<span class="transaction-icon mobile">◀</span>';
               } else if (tipo.toLowerCase().includes("transferencia")) {
                 tipo = "Transferencias a terceros BDV";
                 iconoHTML = '<span class="transaction-icon arrow-left">◀</span>';
