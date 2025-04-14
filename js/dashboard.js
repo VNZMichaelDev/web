@@ -92,10 +92,10 @@ document.addEventListener("DOMContentLoaded", async () => {
               { tipo: "Transferencias a terceros BDV", monto: 25.00, hora: "08:45 PM", icono: "◀" }
             ],
             "SÁBADO, 30 DE NOVIEMBRE": [
-              { tipo: "PagomóvilBDV", monto: 500.00, hora: "12:41 PM", icono: "📱" }
+              { tipo: "Transferencias a terceros BDV", monto: 500.00, hora: "12:41 PM", icono: "◀" }
             ],
             "JUEVES, 28 DE NOVIEMBRE": [
-              { tipo: "PagomóvilBDV", monto: 235.00, hora: "05:28 PM", icono: "📱" }
+              { tipo: "Transferencias a terceros BDV", monto: 235.00, hora: "05:28 PM", icono: "◀" }
             ]
           };
           
