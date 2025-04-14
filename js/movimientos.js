@@ -31,8 +31,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                   let iconoHTML = '';
                   
                   if (descripcion.toLowerCase().includes("pagomovil") || transaccion.metodo_pago === "Pagomóvil") {
-                    descripcion = "Operacion pagomovil bdv";
-                    iconoHTML = '▶';
+                    descripcion = "Transferencias a terceros BDV";
+                    iconoHTML = '◀';
                   } else if (descripcion.toLowerCase().includes("transferencia")) {
                     descripcion = "Transferencias a terceros BDV";
                     iconoHTML = '◀';
